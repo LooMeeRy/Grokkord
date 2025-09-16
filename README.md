@@ -24,7 +24,7 @@
 
   เปิด Terminal ขึ้นมาและใช้คำสั่ง git clone เพื่อดาวน์โหลดโค้ดทั้งหมดลงในเครื่อง:
 
-    git clone https://github.com/LooMeeRy/Grokkord/tree/main
+    git clone https://github.com/LooMeeRy/Grokkord.git
 
  
  <br></br>
