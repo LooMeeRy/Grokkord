@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="th">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>กรอกรหัสกิจกรรม</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <div class="container">
+            <div class="navbar">
+                <a href="{{ url_for('home') }}" class="active"
+                    >กรอกรหัสกิจกรรม</a
+                >
+                <a href="{{ url_for('history') }}">ประวัติการกรอกโค้ด</a>
+                <a href="{{ url_for('logout') }}" class="right">ออกจากระบบ</a>
+            </div>
+
+            <h1>กรอกรหัสกิจกรรมด้วยตนเอง</h1>
+
+            <div class="form-group">
+                <label for="activity-select">เลือกกิจกรรม:</label>
+                <select id="activity-select">
+                    <option value="">กำลังโหลดกิจกรรม...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="code-input">กรอกรหัสกิจกรรม (25 ตัวอักษร):</label>
+                <input
+                    type="text"
+                    id="code-input"
+                    placeholder="กรอกโค้ด 25 ตัวอักษร"
+                    maxlength="25"
+                />
+            </div>
+
+            <button id="submit-button">ส่งข้อมูล</button>
+
+            <div id="message" class="message" style="display: none"></div>
+        </div>
+
+        <script>
+            const activitySelect = document.getElementById("activity-select");
+            const codeInput = document.getElementById("code-input");
+            const submitButton = document.getElementById("submit-button");
+            const messageDiv = document.getElementById("message");
+
+            async function fetchActivities() {
+                try {
+                    const response = await fetch("/get_activities");
+                    const data = await response.json();
+
+                    if (data.success) {
+                        activitySelect.innerHTML =
+                            '<option value="">กรุณาเลือกกิจกรรม</option>';
+                        data.activities.forEach((activity) => {
+                            const option = document.createElement("option");
+                            option.value = activity.value;
+                            option.textContent = activity.text;
+                            activitySelect.appendChild(option);
+                        });
+                    } else {
+                        activitySelect.innerHTML =
+                            '<option value="">เกิดข้อผิดพลาดในการโหลดกิจกรรม</option>';
+                        showMessage(data.message, "error");
+                    }
+                } catch (error) {
+                    activitySelect.innerHTML =
+                        '<option value="">เกิดข้อผิดพลาดในการโหลดกิจกรรม</option>';
+                    showMessage(
+                        "เกิดข้อผิดพลาดในการเชื่อมต่อ: " + error.message,
+                        "error",
+                    );
+                }
+            }
+
+            async function submitForm() {
+                const code = codeInput.value.trim();
+                const activityValue = activitySelect.value;
+
+                if (!code || !activityValue) {
+                    showMessage("กรุณากรอกโค้ดและเลือกกิจกรรม", "error");
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("code", code);
+                formData.append("activity_value", activityValue);
+
+                submitButton.disabled = true;
+                submitButton.textContent = "กำลังส่งข้อมูล...";
+                showMessage("", "");
+
+                try {
+                    const response = await fetch("/submit", {
+                        method: "POST",
+                        body: formData,
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showMessage("การกรอกข้อมูลสำเร็จ!", "success");
+                    } else {
+                        showMessage("เกิดข้อผิดพลาด: " + data.message, "error");
+                    }
+                } catch (error) {
+                    showMessage(
+                        "เกิดข้อผิดพลาดในการเชื่อมต่อ: " + error.message,
+                        "error",
+                    );
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = "ส่งข้อมูล";
+                }
+            }
+
+            function showMessage(message, type) {
+                messageDiv.textContent = message;
+                messageDiv.className = "message " + type;
+                messageDiv.style.display = "block";
+            }
+
+            submitButton.addEventListener("click", submitForm);
+
+            // โหลดกิจกรรมเมื่อหน้าเว็บโหลดเสร็จ
+            fetchActivities();
+        </script>
+    </body>
+</html>

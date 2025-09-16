@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ประวัติการกรอกโค้ด</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <div class="container">
+            <div class="navbar">
+                <a href="{{ url_for('home') }}">กรอกรหัสกิจกรรม</a>
+                <a href="{{ url_for('history') }}" class="active"
+                    >ประวัติการกรอกโค้ด</a
+                >
+                <a href="{{ url_for('logout') }}" class="right">ออกจากระบบ</a>
+            </div>
+
+            <h1>ประวัติการกรอกโค้ด</h1>
+
+            {% if error %}
+            <div class="message error">{{ error }}</div>
+            {% else %}
+            <!-- Section: Compulsory Activities -->
+            <div class="activity-section">
+                <h2>กิจกรรมบังคับ</h2>
+                {% if compulsory_activities %} {% for item in
+                compulsory_activities %}
+                <div class="history-card">
+                    <p><strong>ประเภทกิจกรรม:</strong> {{ item.type }}</p>
+                    <p><strong>กิจกรรม:</strong> {{ item.name }}</p>
+                    <p><strong>โค้ด:</strong> {{ item.code }}</p>
+                    <p><strong>สถานที่:</strong> {{ item.location }}</p>
+                    <p><strong>วันที่กรอก:</strong> {{ item.date }}</p>
+                </div>
+                {% endfor %} {% else %}
+                <p class="no-data">ไม่พบประวัติกิจกรรมบังคับ</p>
+                {% endif %}
+            </div>
+
+            <!-- Section: Supplementary Activities -->
+            <div class="activity-section">
+                <h2>กิจกรรมเสริม</h2>
+                {% if supplementary_activities %} {% for item in
+                supplementary_activities %}
+                <div class="history-card">
+                    <p><strong>ประเภทกิจกรรม:</strong> {{ item.type }}</p>
+                    <p><strong>กิจกรรม:</strong> {{ item.name }}</p>
+                    <p><strong>โค้ด:</strong> {{ item.code }}</p>
+                    <p><strong>สถานที่:</strong> {{ item.location }}</p>
+                    <p><strong>วันที่กรอก:</strong> {{ item.date }}</p>
+                </div>
+                {% endfor %} {% else %}
+                <p class="no-data">ไม่พบประวัติกิจกรรมเสริม</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </body>
+</html>
